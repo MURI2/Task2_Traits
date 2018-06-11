@@ -174,7 +174,7 @@ def buildKernel(size=1):
 		return ret
 	return ret*ksum
 
-def runTest(select,numPerm=10,timeThin=3,dims=['time','strain-regression'],nullDim='strain-regression',colTransform={}):
+def runTest(select,numPerm=10,timeThin=3,dims=['time','strain-regression'], nullDim='strain-regression',colTransform={}):
 	#select = (meta.Condition==control) & (meta.strain.isin([parent,m]))
 
 	temp = data.loc[:,meta.index[select]]
@@ -184,17 +184,21 @@ def runTest(select,numPerm=10,timeThin=3,dims=['time','strain-regression'],nullD
 	#tidy = pd.melt(pivot,id_vars=meta.columns.tolist(),value_vars=data.index.tolist(),
 	#    value_name='OD',var_name='time')
 	tidy = tidyfy(pivot)
+	#return pd.melt(pivot,id_vars=meta.columns.tolist(),value_vars=data.index.tolist(),
+	#	value_name='OD',var_name='time')
 
 	timeSelect = tidy.time.unique()[::timeThin]
 	tidy = tidy[tidy.time.isin(timeSelect)]
-
+	# 'dims' returning an empty list?
 	x = tidy[dims]
+
 	# x.strain = (x.strain!=parent).astype(int)
 	x = x.values
 	y = tidy.OD.values[:,None]
 
 	k = buildKernel(x.shape[1])
 	# k = GPy.kern.RBF(x.shape[1],ARD=True)
+
 
 	gp = GPy.models.GPRegression(x,y,k)
 	gp.optimize()
@@ -228,7 +232,7 @@ def runTest(select,numPerm=10,timeThin=3,dims=['time','strain-regression'],nullD
 
 	return actualBf, perms
 
-def testMutants(mutants,numPerm=10,timeThin=4,dims=[],nullDim='strain-regression'):
+def testMutants(mutants,numPerm=10,timeThin=4,dims=['time','strain-regression'],nullDim='strain-regression'):
 	results = {}
 
 	for i,m in enumerate(mutants):
