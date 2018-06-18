@@ -1,7 +1,7 @@
 from __future__ import division
 import os, re
 import gomp as gp
-import gomp_death as gpd
+#import gomp_death as gpd
 import pandas as pd
 import  matplotlib.pyplot as plt
 from collections import Counter
@@ -14,15 +14,15 @@ def runAnalysis(gpd = False):
     for x in os.listdir(raw_data):
         if x == '.DS_Store':
             continue
-        if x != 'Task2_48hr_48well_discon_170928_135419':
+        if x != 'Task2_48hr_48well_discon_180614_140037':
             continue
         path_IN = raw_data + x + '/' + x + '.txt'
         path_OUT = clean_data + x + '.txt'
         gp.cleanData(path_IN, path_OUT, wells = 48)
-        if gpd == True:
-            gpd.modGompGrowth(path_OUT, smooth = True)
-        else:
-            gp.modGompGrowth(path_OUT, smooth = True)
+        #if gpd == True:
+        #    gpd.modGompGrowth(path_OUT, smooth = True)
+        #else:
+        #    gp.modGompGrowth(path_OUT, smooth = True)
 
 
 
