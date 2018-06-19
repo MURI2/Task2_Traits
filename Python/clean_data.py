@@ -3,8 +3,7 @@ import os, re, pathlib
 import pandas as pd
 import numpy as np
 import  matplotlib.pyplot as plt
-
-mydir = os.path.expanduser("~/GitHub/Task2_Traits")
+import traits_tools as tt
 
 
 def clean_data(path_IN, path_OUT, wells = 48):
@@ -35,19 +34,12 @@ def checkTemp(df):
     if temp_diff > 3:
         print("Temperature difference greater than 3C, check for temperature effects")
 
-def get_time(df):
-    time_split = [list(map(int, x.split(':')))for x in df['Time'].values]
-    time_hours = []
-    for x in time_split:
-        x_hour = ((x[0] * 60) + x[1]) / 60
-        time_hours.append(round(x_hour, 2))
-    t =  np.asarray(time_hours)
-    return t
+
 
 
 
 def plot_data(clean_data_path):
-    out_path = mydir + '/figures/uMax/data_plots/' + re.split('[./]' , clean_data_path)[-2]
+    out_path = tt.get_path() + '/figures/uMax/data_plots/' + re.split('[./]' , clean_data_path)[-2]
     pathlib.Path(out_path).mkdir(exist_ok=True)
     df = pd.read_csv(clean_data_path, sep = '\t')
     time_hours = get_time(df)
@@ -67,10 +59,8 @@ def plot_data(clean_data_path):
 
 
 
-
-
-in_path = mydir + '/data/uMax/raw_data/Task2_48hr_48well_discon_180614_140037/Task2_48hr_48well_discon_180614_140037.txt'
-out_path = mydir + '/data/uMax/clean_data/Task2_48hr_48well_discon_180614_140037.txt'
+in_path = tt.get_path() + '/data/uMax/raw_data/Task2_48hr_48well_discon_180614_140037/Task2_48hr_48well_discon_180614_140037.txt'
+out_path = tt.get_path() + '/data/uMax/clean_data/Task2_48hr_48well_discon_180614_140037.txt'
 
 #cleanData(in_path, out_path)
 plot_data(out_path)
