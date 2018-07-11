@@ -265,9 +265,11 @@ class LagTime(GrowthMetric):
 			self.threshold = threshold
 
 
-	def _compute(self, x, gp ):
+	def _compute(self, predictive_data, model ):
 
-		mu,var = gpDerivative(x,gp)
+		#mu,var = gpDerivative(x,gp)
+		print(predictive_data)
+		mu,var = gpDerivative(predictive_data, model)
 
 		prob = np.array([stats.norm.cdf(0,loc=m,scale=np.sqrt(v))[0] for m,v in zip(mu[:,:,0],var[:,0])])
 
@@ -276,7 +278,7 @@ class LagTime(GrowthMetric):
 			ind += 1
 		if ind == prob.shape[0]:
 			ind -= 1
-		return x[ind]
+		return predictive_data[ind]
 
 class MeanSquareError(GrowthMetric):
 
@@ -289,3 +291,8 @@ class MeanSquareError(GrowthMetric):
 		mse = 1./n * sum(((gp.Y - gp.predict(gp.X)[0])**2)[:,0],)
 
 		return mse
+
+
+# write custom function to get lagTime
+# given funciton not working
+#def new_lagtime():

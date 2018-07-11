@@ -36,8 +36,6 @@ def checkTemp(df):
 
 
 
-
-
 def plot_data(clean_data_path):
     out_path = tt.get_path() + '/figures/uMax/data_plots/' + re.split('[./]' , clean_data_path)[-2]
     pathlib.Path(out_path).mkdir(exist_ok=True)

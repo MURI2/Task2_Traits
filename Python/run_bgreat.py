@@ -2,8 +2,8 @@ from __future__ import division
 import os, re
 import numpy as np
 import pandas as pd
+import traits_tools as tt
 import  matplotlib.pyplot as plt
-import scipy.signal
 import bgreat as bg
 
 mydir = os.path.expanduser("~/GitHub/Task2_Traits/")
@@ -13,7 +13,7 @@ def checkTemp(df):
     temp_max = max(df['Temp_C'])
     temp_diff = temp_max - temp_min
     if temp_diff > 3:
-        print "Temperature difference greater than 3C, check for temperature effects"
+        print("Temperature difference greater than 3C, check for temperature effects")
 
 
 def clean_file(path_IN, path_OUT, wells = 48):
@@ -91,6 +91,7 @@ def clean_data(figs = False):
             fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
             plt.close()
 
+
 def merge_data():
     clean_data_path = mydir + 'data/uMax/clean_data/'
     dfs = []
@@ -126,116 +127,112 @@ def merge_data():
     metadata_OUT = mydir + 'data/uMax/merged_clean_data/metadata.txt'
     metadata.to_csv(metadata_OUT, sep = '\t', index = False)
 
-def bgreat():
-    data_path = mydir + 'data/uMax/merged_clean_data/data.txt'
-    meta_path = mydir + 'data/uMax/merged_clean_data/metadata.txt'
-    data = pd.read_csv(data_path, sep = '\t')
-    meta = pd.read_csv(meta_path, sep = '\t')
-    cols = [c for c in data.columns if (('B' in c) or ('S' in c)) and ('100' in c)]
-    data = data[cols]
-    meta = meta[meta['Sample'].isin(cols)]
 
-    parent = 'B'
-    control = 0
-    condition = 0
+def get_params():
+    df_path = tt.get_path() + '/data/uMax/merged_clean_data/metadata.txt'
+    df = pd.read_csv(df_path, sep = '\t')
 
-    meta['strain-regression'] = (meta.Strain!=parent).astype(int)
-    meta['condition'] = meta['Treatment']
-    meta['interaction'] = meta['strain-regression']*meta.condition
-    # try to add multiple
-    data = np.log10(data)
+merge_data()
 
+#def bgreat():
+#    data_path = mydir + 'data/uMax/merged_clean_data/data.txt'
+#    meta_path = mydir + 'data/uMax/merged_clean_data/metadata.txt'
+#    data = pd.read_csv(data_path, sep = '\t')
+#    meta = pd.read_csv(meta_path, sep = '\t')
+#    cols = [c for c in data.columns if (('B' in c) or ('S' in c)) and ('100' in c)]
+#    data = data[cols]
+#    meta = meta[meta['Sample'].isin(cols)]
 
-    #parent = 'B'
-    #meta['strain-regression'] = (meta.Strain!=parent).astype(int)
-    #bgreat.setGlobals(_data=data,_meta=meta)
-    #bgreat.setGlobals(_parent=parent,_control=control)
+#    parent = 'B'
+#    control = 0
+#    condition = 0
+#
+#    meta['strain-regression'] = (meta.Strain!=parent).astype(int)
+#    meta['condition'] = meta['Treatment']
+#    meta['interaction'] = meta['strain-regression']*meta.condition
+#    # try to add multiple
+#    data = np.log10(data)
+#    #parent = 'B'
+#    #meta['strain-regression'] = (meta.Strain!=parent).astype(int)
+#    #bgreat.setGlobals(_data=data,_meta=meta)
+#    #bgreat.setGlobals(_parent=parent,_control=control)
 
-    #meta['Interaction'] = ((meta.Treatment!=control) & (meta.Strain!=parent)).astype(int)
-    #meta['Condition'] = (meta.Treatment!=control).astype(int)
-    #bgreat.setGlobals(_control=control,_meta=meta)
+#    #meta['Interaction'] = ((meta.Treatment!=control) & (meta.Strain!=parent)).astype(int)
+#    #meta['Condition'] = (meta.Treatment!=control).astype(int)
+#    #bgreat.setGlobals(_control=control,_meta=meta)
 
-    #mutants = ['S']
-    #results = bgreat.testMutants(mutants)
-    #print results
+#    #mutants = ['S']
+#    #results = bgreat.testMutants(mutants)
+#    #print results
+#    #results = bgreat.testMutantCondition(mutants)
 
+#def test_bgreat():
+#    data_path = mydir + 'data/uMax/merged_clean_data/test_data.csv'
+#    meta_path = mydir + 'data/uMax/merged_clean_data/test_meta.csv'
+#    data = pd.read_csv(data_path, sep = ',', index_col=0)
+#    meta = pd.read_csv(meta_path, sep = ',')
 
-    #results = bgreat.testMutantCondition(mutants)
+#    parent = 'parent'
+#    control = 'control'
+#    condition = 'stress'
 
-def test_bgreat():
-    data_path = mydir + 'data/uMax/merged_clean_data/test_data.csv'
-    meta_path = mydir + 'data/uMax/merged_clean_data/test_meta.csv'
-    data = pd.read_csv(data_path, sep = ',', index_col=0)
-    meta = pd.read_csv(meta_path, sep = ',')
+#    meta['strain-regression'] = (meta.strain!=parent).astype(int)
+#    meta['condition'] = (meta.Condition!=control).astype(int)
+#    meta['interaction'] = meta['strain-regression']*meta.condition
 
-    parent = 'parent'
-    control = 'control'
-    condition = 'stress'
+#    bg.setGlobals(_data=data,_meta=meta,_parent=parent,_control=control,_condition=condition)
 
-    meta['strain-regression'] = (meta.strain!=parent).astype(int)
-    meta['condition'] = (meta.Condition!=control).astype(int)
-    meta['interaction'] = meta['strain-regression']*meta.condition
+#    mutants = ['mutant']
+#    results = bg.testMutantCondition(mutants,numPerm=1)
 
-    bg.setGlobals(_data=data,_meta=meta,_parent=parent,_control=control,_condition=condition)
+#    #bg.setGlobals(_data=data,_meta=meta)
 
-    mutants = ['mutant']
-    results = bg.testMutantCondition(mutants,numPerm=1)
+#    #parent = 'parent'
+#    #meta['strain-regression'] = (meta.strain!=parent).astype(int)
+#    #control = 'control'
+#    #bg.setGlobals(_parent=parent,_control=control)
 
-    #bg.setGlobals(_data=data,_meta=meta)
+#    #mutants = ['mutant']
+#    #results = bg.testMutants(mutants)
 
-    #parent = 'parent'
-    #meta['strain-regression'] = (meta.strain!=parent).astype(int)
-    #control = 'control'
-    #bg.setGlobals(_parent=parent,_control=control)
+#    #meta['interaction'] = ((meta.Condition!=control) & (meta.strain!=parent)).astype(int)
+#    #meta['condition'] = (meta.Condition!=control).astype(int)
+#    #bg.setGlobals(_control=control,_meta=meta)
 
-    #mutants = ['mutant']
-    #results = bg.testMutants(mutants)
+#    #results = bg.testMutantCondition(mutants)
+#    #print results
 
-    #meta['interaction'] = ((meta.Condition!=control) & (meta.strain!=parent)).astype(int)
-    #meta['condition'] = (meta.Condition!=control).astype(int)
-    #bg.setGlobals(_control=control,_meta=meta)
+#def figure_test(smooth = True):
+#    data_path = mydir + 'data/uMax/merged_clean_data/data.txt'
+#    meta_path = mydir + 'data/uMax/merged_clean_data/metadata.txt'
+#    data = pd.read_csv(data_path, sep = '\t')
+#    meta = pd.read_csv(meta_path, sep = '\t')
 
-    #results = bg.testMutantCondition(mutants)
-    #print results
+#    cols_B0 = [c for c in data.columns if ('B' in c) and ('L2' in c) and ('-100' in c)]
+#    data_B0 = data[cols_B0]
 
-def figure_test(smooth = True):
-    data_path = mydir + 'data/uMax/merged_clean_data/data.txt'
-    meta_path = mydir + 'data/uMax/merged_clean_data/metadata.txt'
-    data = pd.read_csv(data_path, sep = '\t')
-    meta = pd.read_csv(meta_path, sep = '\t')
+#    cols_S0 = [c for c in data.columns if ('S' in c) and ('L2' in c) and ('-100' in c)]
+#    data_S0 = data[cols_S0]
+#    fig = plt.figure()
+#    for column in data_B0:
+#        column_zip = zip(data['Time'].values, data_B0[column].values)
+#        column_zip = [x for x in column_zip if np.isnan(x[1]) == False]
+#        t = [x[0] for x in column_zip]
 
-    cols_B0 = [c for c in data.columns if ('B' in c) and ('L2' in c) and ('-100' in c)]
-    data_B0 = data[cols_B0]
+#        od = [x[1] for x in column_zip]
 
-    cols_S0 = [c for c in data.columns if ('S' in c) and ('L2' in c) and ('-100' in c)]
-    data_S0 = data[cols_S0]
-    fig = plt.figure()
-    for column in data_B0:
-        column_zip = zip(data['Time'].values, data_B0[column].values)
-        column_zip = [x for x in column_zip if np.isnan(x[1]) == False]
-        t = [x[0] for x in column_zip]
+#        plt.plot(t, od, c = 'blue', lw = 2, alpha = 0.7)
 
-        od = [x[1] for x in column_zip]
+#    for column in data_S0:
+#        column_zip = zip(data['Time'].values, data_S0[column].values)
+#        column_zip = [x for x in column_zip if np.isnan(x[1]) == False]
+#        t = [x[0] for x in column_zip]
+#        od = [x[1] for x in column_zip]
 
-        plt.plot(t, od, c = 'blue', lw = 2, alpha = 0.7)
+#        plt.plot(t, od, c = 'black', lw = 2, alpha = 0.7)
 
-    for column in data_S0:
-        column_zip = zip(data['Time'].values, data_S0[column].values)
-        column_zip = [x for x in column_zip if np.isnan(x[1]) == False]
-        t = [x[0] for x in column_zip]
-        od = [x[1] for x in column_zip]
-
-        plt.plot(t, od, c = 'black', lw = 2, alpha = 0.7)
-
-    #fig = plt.figure()
-    #fig_direct =  re.split(r'[./]',path_OUT)
-    fig_name = mydir + 'figures/SSE_grant.png'
-    fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
-    plt.close()
-
-
-
-#clean_data(figs = False)
-#merge_data()
-#bgreat()
-#figure_test()
+#    #fig = plt.figure()
+#    #fig_direct =  re.split(r'[./]',path_OUT)
+#    fig_name = mydir + 'figures/SSE_grant.png'
+#    fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
+#    plt.close()
